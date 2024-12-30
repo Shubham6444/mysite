@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Welcome to the Dashboard</h1>
+  <p id="email-display"></p>
+
+  <script>
+    // Fetch the email from the server session
+    fetch('/api/email')
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Unauthorized');
+      })
+      .then((data) => {
+        document.getElementById('email-display').textContent = `Logged in as: ${data.email}`;
+      })
+      .catch((error) => {
+        document.getElementById('email-display').textContent = 'You are not logged in.';
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+</html>

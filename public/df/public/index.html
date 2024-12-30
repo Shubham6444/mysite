@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Code Editor</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://unpkg.com/monaco-editor/min/vs/loader.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        #editor { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="editor"></div>
+
+    <script>
+        const socket = io.connect('http://localhost:3000');
+        let editor;
+        let debounceTimeout;
+        const DEBOUNCE_DELAY = 300; // Delay for debouncing changes
+        let isUpdating = false; // Flag to prevent multiple updates
+        let lastCursorPosition = { lineNumber: 1, column: 1 }; // Default starting position
+
+        // Monaco Editor configuration
+        require.config({ paths: { vs: 'https://unpkg.com/monaco-editor/min/vs' }}); 
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: '',
+                language: 'javascript'
+            });
+
+            // Handle content changes with debounce (outgoing updates)
+            editor.getModel().onDidChangeContent(() => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    if (!isUpdating) {
+                        socket.emit('codeChange', editor.getValue());
+                    }
+                }, DEBOUNCE_DELAY);
+            });
+
+            // Listen for code changes from other users (incoming updates)
+            socket.on('codeChange', (data) => {
+                if (!isUpdating) {
+                    const currentContent = editor.getValue();
+
+                    // Only update if content is different from the current content
+                    if (currentContent !== data) {
+                        // Save the current cursor position
+                        const position = editor.getPosition();
+                        const selection = editor.getSelection();
+
+                        isUpdating = true; // Prevent further updates while updating
+                        
+                        // Update the editor with new content
+                        editor.setValue(data); 
+
+                        // Wait for Monaco to apply the content update
+                        setTimeout(() => {
+                            // Adjust cursor position to the previously saved location
+                            editor.setPosition(lastCursorPosition);
+                            editor.setSelection(selection); // Restore the selection
+
+                            isUpdating = false; // Allow updates again
+                        }, 100); // Small delay to ensure Monaco Editor processes the content update
+                    }
+                }
+            });
+        });
+
+        // Resize editor on window resize
+        window.addEventListener('resize', () => {
+            editor.layout();
+        });
+    </script>
+</body>
+</html>

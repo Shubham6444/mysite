@@ -1,0 +1,386 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech to Text</title>
+</head>
+<body>
+  <button id="startButton">Start Listening</button>
+  <p id="outputText">Your spoken text will appear here...</p>
+
+  <script>
+
+
+
+    const startButton = document.getElementById("startButton");
+    const outputText = document.getElementById("outputText");
+
+    // Check if the browser supports SpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US"; // Set language (e.g., "en-US", "hi-IN")
+      recognition.continuous = false; // Stops after speaking
+
+      startButton.addEventListener("click", () => {
+        recognition.start(); // Start listening
+      });
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript; // Get the transcribed text
+        outputText.textContent = spokenText; // Display the text on the page
+      };
+
+      recognition.onerror = (event) => {
+        alert("Error occurred: " + event.error);
+      };
+    } else {
+      alert("Speech Recognition not supported in this browser.");
+    }
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ece5dd;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 30%;
+            background-color: #ffffff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode .sidebar {
+            background-color: #2c2c2c;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            background-color: #075e54;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .contact-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .contact {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .contact:hover {
+            background-color: #f5f5f5;
+        }
+
+        .contact img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #075e54;
+            color: white;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #e5ddd5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            word-wrap: break-word;
+        }
+
+        .message.incoming {
+            background-color: #ffffff;
+            align-self: flex-start;
+        }
+
+        .message.outgoing {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+        }
+
+        .chat-input {
+            padding: 10px;
+            display: flex;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input textarea {
+            flex-grow: 1;
+            resize: none;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            background-color: #075e54;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .chat-input button:hover {
+            background-color: #0b7a61;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 10px;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+        }
+
+        /* Dark Mode Button */
+        .dark-mode-btn {
+            background-color: #075e54;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Icons */
+        .icons {
+            display: flex;
+            align-items: center;
+        }
+
+        .icons img {
+            width: 30px;
+            height: 30px;
+            margin-left: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">Contacts</div>
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="searchUser" placeholder="Search contacts...">
+                <button class="dark-mode-btn" onclick="toggleDarkMode()">🌙</button>
+            </div>
+            <div class="contact-list" id="contact-list"></div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="icons">
+                    <img src="user-icon.png" alt="User" id="user-icon" style="width: 30px; height: 30px;">
+                    <span id="user-name">Select a contact</span>
+                    <img src="notification.png" alt="Notifications" style="width: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <textarea id="inputvalue" placeholder="Type a message"></textarea>
+                <button id="startButton"><i class="fas fa-microphone" style="font-size:20px"></i></button>
+                <button onclick="send()"><img src="send.png" alt="Send"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDarkMode = false;
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            document.querySelector('.sidebar').classList.toggle('dark-mode', isDarkMode);
+        }
+
+        // Function to search users
+        document.getElementById('searchUser').addEventListener('input', function () {
+            const query = this.value.toLowerCase();
+            const contacts = document.querySelectorAll('.contact');
+            contacts.forEach(contact => {
+                const contactName = contact.querySelector('span').textContent.toLowerCase();
+                if (contactName.includes(query)) {
+                    contact.style.display = 'flex';
+                } else {
+                    contact.style.display = 'none';
+                }
+            });
+        });
+
+        // Prompt for user login
+        const currentUser = prompt("Enter Your Name");
+
+        // Validate username
+        if (currentUser && currentUser.length >= 4 && currentUser.length <= 15) {
+            document.getElementById("user-name").innerText = currentUser;
+            alert(`Welcome, ${currentUser}!`);
+        } else {
+            alert("Invalid input. Name must be between 4 and 15 characters.");
+            location.reload();  // Reload page if the input is invalid
+        }
+
+        // Send message function
+        function send() {
+            const messageInput = document.getElementById("inputvalue");
+            const message = messageInput.value.trim();
+            if (message) {
+                const chatMessages = document.getElementById("chatMessages");
+                const messageElement = document.createElement("div");
+                messageElement.classList.add("message", "outgoing");
+                messageElement.textContent = message;
+                chatMessages.appendChild(messageElement);
+                messageInput.value = '';
+            }
+        }
+    </script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</body>
+</html>
